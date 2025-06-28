@@ -8,6 +8,10 @@ const props = defineProps({
 
 <template>
   <div class="p-6">
+    <router-link href="/tasks/create" class="bg-green-600 text-white px-3 py-2 rounded mb-5">
+      + New Task
+    </router-link>
+  
     <h1 class="text-2xl font-bold mb-4">Your Tasks</h1>
 
     <div v-if="tasks.length">
