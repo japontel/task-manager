@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +24,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//     Route::resource('tasks', TaskController::class);
+//     Route::resource('categories', CategoryController::class);
+// });
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 });
 
 require __DIR__.'/auth.php';
