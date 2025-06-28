@@ -25,6 +25,9 @@ class TaskController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         $categories = \App\Models\Category::select('id', 'name')->get();
@@ -64,7 +67,29 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $task = Task::with('category')
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        return Inertia::render('Tasks/Show', [
+            'task' => $task,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $task = Task::where('user_id', Auth::id())->findOrFail($id);
+        $categories = \App\Models\Category::select('id', 'name')->get();
+        $statuses = ['pending', 'in_progress', 'completed'];
+
+        return Inertia::render('Tasks/Edit', [
+            'task' => $task,
+            'categories' => $categories,
+            'statuses' => $statuses,
+        ]);
     }
 
     /**
@@ -72,7 +97,23 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'status' => 'required|in:pending,in_progress,completed',
+        ]);
+
+        $task = Task::where('user_id', Auth::id())->findOrFail($id);
+
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
     /**
@@ -80,6 +121,9 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $task = Task::where('user_id', Auth::id())->findOrFail($id);
+        $task->delete();
+
+        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully.');
     }
 }
